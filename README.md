@@ -37,7 +37,8 @@ winzip tgz my_package
 
 ## Options
 **Note:** An option is always required
- 
+
+```
 zip  - (String) Zip a file/files
 tar - (String)  Tar a file/files
 tgz  - (String) Tar and GZip a file/files
