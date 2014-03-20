@@ -1,0 +1,111 @@
+#!/usr/bin/env node
+
+var winzip = require('../lib/winzip'),
+    path = require('path'),
+    args = process.argv.slice(2),
+    cwd = process.cwd();
+
+
+    
+/*
+    Handles error messages
+    
+    @params: (String) msg - error message
+*/ 
+function handleError(msg) {
+    "use strict";
+    
+    console.log();
+    console.log('Error');
+    console.error(' > ' + msg);
+    process.exit(1); 
+}
+
+
+/*
+    Parses user input commands
+    
+    @params: (String) cmd - command to be executed
+*/
+function parseCommand(cmd) {
+    "use strict";
+    
+    var Options = {
+        'zip': 1,
+        'tar': 1,
+        'tgz': 1
+    };
+    
+    if (!cmd) {
+       return handleError('No arguments');
+    }
+    
+    cmd = cmd.trim();
+    
+    if (cmd.indexOf('-') > -1) {
+        cmd = cmd.replace('-', '');
+    }
+    
+    if (!Options.hasOwnProperty(cmd)) {
+        return handleError('Unknown argument');
+    }
+    
+    return cmd;
+}
+
+
+
+/*
+    Main program
+*/    
+function exec () {
+    "use strict";
+    
+    var cmd, src, dest, destExt, mapExt;
+    
+    if (!args.length) {
+        return handleError('No arguments');    
+    }
+    
+    if (args.length < 2) {
+        return handleError('You did not specify a directory');    
+    }
+    
+    
+    mapExt = {
+        'zip': '.zip',
+        'tar': '.tar',
+        'tgz': '.tar.gz'    
+    };
+    
+    cmd = parseCommand(args[0]);
+    src = args[1];
+    
+    // if a destination file is specified
+    if (args.length === 3) {
+        dest = args[2];
+        
+        // get destination extension
+        destExt = path.extname(dest);
+        
+        // ext not specified or not matching command
+        if (!destExt || destExt !== mapExt[cmd]) {
+            dest = dest + mapExt[cmd];    
+        }
+    }
+    else {
+        dest = src + mapExt[cmd];
+    }
+    
+    src = path.join(cwd, src);
+    dest = path.join(cwd, dest);
+    
+    // call winzip
+    winzip(src, dest, cmd);
+}
+
+
+
+
+// execute
+exec();
